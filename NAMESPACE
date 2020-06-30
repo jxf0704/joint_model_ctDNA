@@ -3,4 +3,5 @@
 export(CrossValJM_AUC)
 export(CrossValJM_AUC_repeat)
 export(patient_prediction)
+export(summary_single_time_point)
 export(survival_risk_AUC)

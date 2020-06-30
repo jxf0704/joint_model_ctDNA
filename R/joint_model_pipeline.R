@@ -182,3 +182,69 @@ CrossValJM_AUC_repeat<-function(summary_table,repeat_time=5,i=5){
   return(final_result)
 
 }
+
+
+#' Title
+#'
+#' @param a_data_frame
+#' @param value_column
+#' @param mutation_select_method
+#' @param summary_method
+#' @param n
+#'
+#' @return
+#' @export
+#'
+#' @examples
+summary_single_time_point<-function(a_data_frame,value_column="AF",mutation_select_method,summary_method,n=2){
+  if (mutation_select_method=="highest"){
+    a_data_frame<-a_data_frame[order(a_data_frame[,value_column],decreasing=T),]
+    final_data_frame<-a_data_frame[1,]
+    final_data_frame$mutation_select_method<-mutation_select_method
+    final_data_frame$value_column<-value_column
+    final_data_frame$summary_method<-"highest"
+    return(final_data_frame)
+  }
+  if (mutation_select_method=="all"){
+    text=paste(summary_method,"(a_data_frame[,value_column],na.rm=T)",sep="")
+    value<-eval(parse(text=text))
+    final_data_frame<-a_data_frame[1,]
+    final_data_frame[1,value_column]<-value
+    final_data_frame$mutation_select_method<-mutation_select_method
+    final_data_frame$value_column<-value_column
+    final_data_frame$summary_method<-summary_method
+    return(final_data_frame)
+  }
+  if (mutation_select_method=="top_n"){
+    a_data_frame<-a_data_frame[order(a_data_frame[,value_column],decreasing=T),]
+    if (n<=nrow(a_data_frame)){
+      select_table<-a_data_frame[1:n,]
+    }
+    if (n>nrow(a_data_frame)){
+      select_table<-a_data_frame
+    }
+    text=paste(summary_method,"(select_table[,value_column],na.rm=T)",sep="")
+    value<-eval(parse(text=text))
+    final_data_frame<-select_table[1,]
+    final_data_frame[1,value_column]<-value
+    final_data_frame$mutation_select_method<-paste(mutation_select_method,n,sep="_")
+    final_data_frame$value_column<-value_column
+    final_data_frame$summary_method<-summary_method
+    return(final_data_frame)
+  }
+  if (!is.na(as.numeric(mutation_select_method))){
+    percentage<-as.numeric(mutation_select_method)/100
+    keep_number<-round(nrow(a_data_frame)*percentage)
+    a_data_frame<-a_data_frame[order(a_data_frame[,value_column],decreasing=T),]
+    select_table<-a_data_frame[1:keep_number,]
+    text=paste(summary_method,"(select_table[,value_column],na.rm=T)",sep="")
+    value<-eval(parse(text=text))
+    final_data_frame<-select_table[1,]
+    final_data_frame[1,value_column]<-value
+    final_data_frame$mutation_select_method<-paste(mutation_select_method,n,sep="_")
+    final_data_frame$value_column<-value_column
+    final_data_frame$summary_method<-summary_method
+    return(final_data_frame)
+  }
+
+}
